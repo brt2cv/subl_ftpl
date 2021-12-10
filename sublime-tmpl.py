@@ -13,7 +13,7 @@ import zipfile
 import re
 import shutil
 
-PACKAGE_NAME = 'SublimeTmpl'
+PACKAGE_NAME = 'subl_ftpl'
 TMLP_DIR = 'templates'
 KEY_SYNTAX = 'syntax'
 KEY_FILE_EXT = 'extension'
@@ -49,18 +49,20 @@ class MergedSettings(sublime.Settings):
     def __init__(self, view):
         self.fallback_settings = {}
         self.settings = sublime.load_settings(PACKAGE_NAME + '.sublime-settings')
+
         if IS_GTE_ST3:
             self.fallback_settings = self.settings
             self.settings = view.settings().get("SublimeTmpl", {})  # project overrides
-     
+
+
     def get(self, name, default=None):
         return self.settings.get(name, self.fallback_settings.get(name, default))
-        
+
 
 def get_settings(view, type=None):
     """ Get settings object, with any project-specific overrides merged in """
     settings = MergedSettings(view)
-    
+
     if not type:
         return settings
 
@@ -89,7 +91,7 @@ class SublimeTmplCommand(sublime_plugin.TextCommand):
                 for filename in filenames:
                     if os.path.splitext(filename)[1] == template_extension:
                         self.project_templates.append((dirpath, os.path.splitext(filename)[0]))
-            
+
             options = []
             for (path, name) in self.project_templates:
                 options.append("Template: {}".format(name))
@@ -124,7 +126,7 @@ class SublimeTmplCommand(sublime_plugin.TextCommand):
     def run_project_template(self, index):
         self.view.run_command('sublime_tmpl',
                                     args={'type': self.project_templates[index][1]})
-    
+
     @staticmethod
     def open_file(path, mode='r'):
         with open(path, mode) as fp:
@@ -164,7 +166,7 @@ class SublimeTmplCommand(sublime_plugin.TextCommand):
             paths.append(user_tmpl_dir)
         if os.path.exists(tmpl_dir):
             paths.append(tmpl_dir)
-        
+
         return paths
 
     def get_project_template_folder(self):
@@ -211,7 +213,7 @@ class SublimeTmplCommand(sublime_plugin.TextCommand):
         # format
         settings = get_settings(self.view)
         pattern = get_replace_pattern(settings)
- 
+
         format = settings.get('date_format', '%Y-%m-%d')
         date = datetime.datetime.now().strftime(format)
         if not IS_GTE_ST3:
@@ -280,18 +282,18 @@ class SublimeTmplEventListener(sublime_plugin.EventListener):
         disable_keymap_actions = settings.get('disable_keymap_actions', '')
         # print ("key1: %s, %s" % (key, disable_keymap_actions))
         global DISABLE_KEYMAP
-        DISABLE_KEYMAP = False;
+        DISABLE_KEYMAP = False
         if not key.startswith('sublime_tmpl.'):
             return None
         if not disable_keymap_actions: # no disabled actions
             return True
         elif disable_keymap_actions == 'all' or disable_keymap_actions == True: # disable all actions
-            DISABLE_KEYMAP = True;
+            DISABLE_KEYMAP = True
             return False
         prefix, name = key.split('.')
         ret = name not in re.split(r'\s*,\s*', disable_keymap_actions.strip())
         # print(name, ret)
-        DISABLE_KEYMAP = True if not ret else False;
+        DISABLE_KEYMAP = True if not ret else False
         return ret
 
     def on_activated(self, view):
@@ -301,7 +303,7 @@ class SublimeTmplEventListener(sublime_plugin.EventListener):
         if settings.get('enable_file_variables_on_save', False):
             self.unsaved_ids[view.id()] = True
         # print('on_activated', self.unsaved_ids, view.id(), view.file_name())
-        
+
     def on_pre_save(self, view):
         if not view.id() in self.unsaved_ids:
             return
@@ -321,18 +323,18 @@ def plugin_loaded():  # for ST3 >= 3016
     TARGET_PATH = os.path.join(PACKAGES_PATH, PACKAGE_NAME)
     # print(BASE_PATH, os.path.dirname(BASE_PATH), TARGET_PATH)
 
-    # auto create custom_path
-    custom_path = os.path.join(PACKAGES_PATH, 'User', PACKAGE_NAME, TMLP_DIR)
-    # print(custom_path, os.path.isdir(custom_path))
-    not_existed = not os.path.isdir(custom_path)
-    if not_existed:
-        os.makedirs(custom_path)
+    # # auto create custom_path
+    # custom_path = os.path.join(PACKAGES_PATH, 'User', PACKAGE_NAME, TMLP_DIR)
+    # # print(custom_path, os.path.isdir(custom_path))
+    # not_existed = not os.path.isdir(custom_path)
+    # if not_existed:
+    #     os.makedirs(custom_path)
 
-        files = glob.iglob(os.path.join(BASE_PATH, TMLP_DIR, '*.tmpl'))
-        for file in files:
-            dst_file = os.path.join(custom_path, os.path.basename(file))
-            if not os.path.exists(dst_file):
-                shutil.copy(file, dst_file)
+    #     files = glob.iglob(os.path.join(BASE_PATH, TMLP_DIR, '*.tmpl'))
+    #     for file in files:
+    #         dst_file = os.path.join(custom_path, os.path.basename(file))
+    #         if not os.path.exists(dst_file):
+    #             shutil.copy(file, dst_file)
 
 
     # first run (https://git.io/vKMIS, does not need extract files)

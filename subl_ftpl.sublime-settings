@@ -41,7 +41,7 @@
         "extension": "md"
     },
     "MarkdownEditing": {
-        "syntax": "Packages/MarkdownEditing/Markdown.tmLanguage",
+        "syntax": "Packages/MarkdownEditing/syntaxes/Markdown.sublime-syntax",
         "extension": "md"
     },
     "md_for_customer": {

@@ -11,7 +11,6 @@ import glob
 import datetime
 import zipfile
 import re
-import shutil
 
 PACKAGE_NAME = 'subl_ftpl'
 TMLP_DIR = 'templates'
@@ -72,7 +71,7 @@ def get_settings(view, type=None):
 
 class SublimeTmplCommand(sublime_plugin.TextCommand):
 
-    def run(self, edit, type='html', paths = None):
+    def run(self, edit, type='html', paths=None):
         view = self.view
 
         if type == 'project':
@@ -104,8 +103,8 @@ class SublimeTmplCommand(sublime_plugin.TextCommand):
                 options,
                 selected_index=0,
                 on_select=self.run_project_template,
-                on_highlight=None,
-                )
+                on_highlight=None
+            )
 
             return
 
